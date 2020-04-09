@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
 	<header>
-		<smile version="1.0" namespace="std, isee" uses_submodels=""/>
+		<smile version="1.0" namespace="std, isee"/>
 		<name>Fit statistics module</name>
-		<uuid>e2e6997b-0d85-41ab-a0a0-f7fa56647e08</uuid>
+		<uuid>8c55b970-a0ad-4fab-91e1-a20bc4956f65</uuid>
 		<vendor>isee systems, inc.</vendor>
-		<product version="1.9.4" isee:build_number="1995" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+		<product version="1.9.5" isee:build_number="2097" isee:saved_by_v1="true" lang="en">Stella Architect</product>
 	</header>
 	<sim_specs isee:sim_duration="1.38462" isee:simulation_delay="0.115385" isee:restore_on_start="false" method="Euler" time_units="Months" isee:instantaneous_flows="false">
 		<start>0</start>
@@ -37,7 +37,6 @@
 			<stock name="Total ABS\nerror">
 				<eqn>0</eqn>
 				<inflow>ABS_error_at_t</inflow>
-				<non_negative/>
 			</stock>
 			<flow name="ABS\nerror at t">
 				<eqn>ABS(X_simulated-X_observed)</eqn>
@@ -49,7 +48,6 @@
 			<stock name="Total\nsquared\nerror">
 				<eqn>0</eqn>
 				<inflow>Squared_error_at_t</inflow>
-				<non_negative/>
 			</stock>
 			<flow name="Squared\nerror at t">
 				<eqn>(X_simulated-X_observed)^2</eqn>
@@ -58,63 +56,29 @@
 			<aux name="MSE" access="output">
 				<eqn>SAFEDIV(Total_squared_error, TIME-STARTTIME)</eqn>
 			</aux>
-			<module name="E Xsim" isee:label="">
-				<connect to="E_Xsim.Flow_1" from=".X_simulated"/>
-				<connect2 to="E_Xsim.Flow_1" from="X_simulated"/>
-				<connect to=".Xsim_mean" from="E_Xsim.Expected_value"/>
-				<connect2 to="Xsim_mean" from="E_Xsim.Expected_value"/>
-			</module>
-			<module name="E Xobs" isee:label="">
-				<connect to="E_Xobs.Flow_1" from=".X_observed"/>
-				<connect2 to="E_Xobs.Flow_1" from="X_observed"/>
-				<connect to=".Xobs_mean" from="E_Xobs.Expected_value"/>
-				<connect2 to="Xobs_mean" from="E_Xobs.Expected_value"/>
-			</module>
-			<module name="E XsimXobs" isee:label="">
-				<connect to="E_XsimXobs.Flow_1" from=".XsimXobs"/>
-				<connect2 to="E_XsimXobs.Flow_1" from="XsimXobs"/>
-				<connect to=".Xsim_x_Xobs_mean" from="E_XsimXobs.Expected_value"/>
-				<connect2 to="Xsim_x_Xobs_mean" from="E_XsimXobs.Expected_value"/>
-			</module>
-			<aux name="XsimXobs">
-				<eqn>X_simulated * X_observed</eqn>
+			<aux name="Mean Xsim">
+				<eqn>SAFEDIV(Total_Xsim,  TIME-STARTTIME)</eqn>
 			</aux>
-			<aux name="Xsim mean" access="input"/>
-			<aux name="Xsim x Xobs mean" access="input"/>
-			<aux name="Xobs mean" access="input"/>
+			<aux name="Mean Xsim * Xobs">
+				<eqn>SAFEDIV(&quot;Total_Xsim_*_Xobs&quot;,  TIME-STARTTIME)</eqn>
+			</aux>
+			<aux name="Mean Xobs">
+				<eqn>SAFEDIV(Total_Xobs,  TIME-STARTTIME)</eqn>
+			</aux>
 			<aux name="Covariance XsimXobs" access="output">
-				<eqn>Xsim_x_Xobs_mean -
-Xsim_mean*Xobs_mean -
-Xsim_mean*Xobs_mean +
-Xsim_mean*Xobs_mean</eqn>
+				<eqn>&quot;Mean_Xsim_*_Xobs&quot; -
+Mean_Xsim*Mean_Xobs -
+Mean_Xsim*Mean_Xobs +
+Mean_Xsim*Mean_Xobs</eqn>
 			</aux>
-			<module name="E Xsim^2" isee:label="">
-				<connect to='"E_Xsim^2".Flow_1' from='."Xsim^2"'/>
-				<connect2 to='"E_Xsim^2".Flow_1' from='"Xsim^2"'/>
-				<connect to=".asdf" from='"E_Xsim^2".Expected_value'/>
-				<connect2 to="asdf" from='"E_Xsim^2".Expected_value'/>
-			</module>
-			<aux name="Xsim^2">
-				<eqn>X_simulated*
-X_simulated</eqn>
-			</aux>
-			<aux name="asdf" access="input"/>
 			<aux name="Xsim standard deviation">
-				<eqn>SQRT(asdf - Xsim_mean^2)</eqn>
+				<eqn>SQRT(&quot;Mean_Xsim^2&quot; - Mean_Xsim^2)</eqn>
 			</aux>
-			<module name="E Xobs^2" isee:label="">
-				<connect to='"E_Xobs^2".Flow_1' from='."Xobs^2"'/>
-				<connect2 to='"E_Xobs^2".Flow_1' from='"Xobs^2"'/>
-				<connect to=".asdf_1" from='"E_Xobs^2".Expected_value'/>
-				<connect2 to="asdf_1" from='"E_Xobs^2".Expected_value'/>
-			</module>
-			<aux name="Xobs^2">
-				<eqn>X_observed*
-X_observed</eqn>
+			<aux name="Mean Xobs^2">
+				<eqn>SAFEDIV(&quot;Total_Xobs^2&quot;,  TIME-STARTTIME)</eqn>
 			</aux>
-			<aux name="asdf 1" access="input"/>
 			<aux name="Xobs standard deviation">
-				<eqn>SQRT(asdf_1 - Xobs_mean^2)</eqn>
+				<eqn>SQRT(&quot;Mean_Xobs^2&quot; - Mean_Xobs^2)</eqn>
 			</aux>
 			<aux name="Correlation.XsimXobs" access="output">
 				<eqn>SAFEDIV(Covariance_XsimXobs, 
@@ -127,7 +91,7 @@ Xsim_standard_deviation*Xobs_standard_deviation)</eqn>
 				<eqn>&quot;Correlation.XsimXobs&quot;^2</eqn>
 			</aux>
 			<aux name="Um" access="output">
-				<eqn>SAFEDIV((Xsim_mean-Xobs_mean)^2, MSE)</eqn>
+				<eqn>SAFEDIV((Mean_Xsim-Mean_Xobs)^2, MSE)</eqn>
 			</aux>
 			<aux name="Us" access="output">
 				<eqn>SAFEDIV((Xsim_standard_deviation-Xobs_standard_deviation)^2, MSE)</eqn>
@@ -137,8 +101,55 @@ Xsim_standard_deviation*Xobs_standard_deviation)</eqn>
 Xsim_standard_deviation*
 Xobs_standard_deviation, MSE)</eqn>
 			</aux>
-			<aux name="X observed" access="input"/>
-			<aux name="X simulated" access="input"/>
+			<aux name="X observed" access="input">
+				<eqn>0</eqn>
+			</aux>
+			<aux name="X simulated" access="input">
+				<eqn>.5</eqn>
+			</aux>
+			<stock name="Total Xsim^2l">
+				<eqn>0</eqn>
+				<inflow>&quot;Xsim^2&quot;</inflow>
+				<units>0</units>
+			</stock>
+			<flow name="Xsim^2">
+				<eqn>X_simulated^2</eqn>
+			</flow>
+			<aux name="Mean Xsim^2" access="output">
+				<eqn>SAFEDIV(&quot;Total_Xsim^2l&quot;, TIME-STARTTIME)</eqn>
+			</aux>
+			<stock name="Total Xsim">
+				<eqn>0</eqn>
+				<inflow>Xsim</inflow>
+				<units>0</units>
+			</stock>
+			<flow name="Xsim">
+				<eqn>X_simulated</eqn>
+			</flow>
+			<stock name="Total Xsim * Xobs">
+				<eqn>0</eqn>
+				<inflow>&quot;Xsim_*_Xobs&quot;</inflow>
+				<units>0</units>
+			</stock>
+			<flow name="Xsim * Xobs">
+				<eqn>X_simulated*X_observed</eqn>
+			</flow>
+			<stock name="Total Xobs">
+				<eqn>0</eqn>
+				<inflow>Xobs</inflow>
+				<units>0</units>
+			</stock>
+			<flow name="Xobs">
+				<eqn>X_observed</eqn>
+			</flow>
+			<stock name="Total Xobs^2">
+				<eqn>0</eqn>
+				<inflow>&quot;Xobs^2&quot;</inflow>
+				<units>0</units>
+			</stock>
+			<flow name="Xobs^2">
+				<eqn>X_observed^2</eqn>
+			</flow>
 		</variables>
 		<views>
 			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
@@ -185,7 +196,7 @@ Xobs_standard_deviation, MSE)</eqn>
 				<isee:iframe color="black" background="white"/>
 				<isee:financial_table color="black" background="white" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
 			</style>
-			<view isee:show_pages="false" background="white" page_width="768" page_height="588" isee:page_cols="2" isee:page_rows="2" isee:scroll_x="9.16667" isee:scroll_y="285" zoom="120" isee:popup_graphs_are_comparative="true" type="stock_flow">
+			<view isee:show_pages="false" background="white" page_width="768" page_height="588" isee:page_cols="2" isee:page_rows="2" isee:scroll_x="7.5" isee:scroll_y="230" zoom="120" isee:popup_graphs_are_comparative="true" type="stock_flow">
 				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
 					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
 						<shape type="rectangle" width="45" height="35"/>
@@ -246,254 +257,269 @@ Xobs_standard_deviation, MSE)</eqn>
 					<from>Total_squared_error</from>
 					<to>MSE</to>
 				</connector>
-				<module x="214.167" y="603.333" width="55" height="45" name="E Xsim"/>
-				<module x="213.333" y="746.666" width="55" height="45" name="E Xobs"/>
-				<module x="214.167" y="673.333" width="55" height="45" name="E XsimXobs"/>
-				<aux x="142.292" y="695.833" name="XsimXobs"/>
-				<connector uid="3" angle="2.40093">
-					<from>XsimXobs</from>
-					<to>E_XsimXobs</to>
-				</connector>
-				<aux font_style="italic" font_weight="bold" x="338.333" y="625.833" name="Xsim mean"/>
-				<aux font_style="italic" font_weight="bold" x="338.333" y="695.833" name="Xsim x Xobs mean"/>
-				<aux font_style="italic" font_weight="bold" x="338.333" y="769.166" name="Xobs mean"/>
-				<connector uid="4" angle="358.238">
-					<from>E_Xsim</from>
-					<to>Xsim_mean</to>
-				</connector>
-				<connector uid="5" angle="0">
-					<from>E_XsimXobs</from>
-					<to>Xsim_x_Xobs_mean</to>
-				</connector>
-				<connector uid="6" angle="357.838">
-					<from>E_Xobs</from>
-					<to>Xobs_mean</to>
-				</connector>
-				<aux x="466.667" y="695.833" name="Covariance XsimXobs"/>
-				<connector uid="7" angle="327.529">
-					<from>Xsim_mean</from>
+				<aux x="473.333" y="625.833" name="Mean Xsim"/>
+				<aux x="473.333" y="695.833" name="Mean Xsim * Xobs"/>
+				<aux x="473.333" y="769.166" name="Mean Xobs"/>
+				<aux x="601.667" y="695.833" name="Covariance XsimXobs"/>
+				<connector uid="3" angle="327.529">
+					<from>Mean_Xsim</from>
 					<to>Covariance_XsimXobs</to>
 				</connector>
-				<connector uid="8" angle="359.999">
-					<from>Xsim_x_Xobs_mean</from>
+				<connector uid="4" angle="0">
+					<from>&quot;Mean_Xsim_*_Xobs&quot;</from>
 					<to>Covariance_XsimXobs</to>
 				</connector>
-				<connector uid="9" angle="30.9626">
-					<from>Xobs_mean</from>
+				<connector uid="5" angle="30.9626">
+					<from>Mean_Xobs</from>
 					<to>Covariance_XsimXobs</to>
 				</connector>
-				<module x="214.167" y="527.5" width="55" height="45" name="E Xsim^2"/>
-				<aux x="142.292" y="550" name="Xsim^2"/>
-				<connector uid="10" angle="359.999">
-					<from>&quot;Xsim^2&quot;</from>
-					<to>&quot;E_Xsim^2&quot;</to>
-				</connector>
-				<aux font_style="italic" font_weight="bold" x="338.333" y="550" name="asdf"/>
-				<connector uid="11" angle="0">
-					<from>&quot;E_Xsim^2&quot;</from>
-					<to>asdf</to>
-				</connector>
-				<aux x="466.667" y="594.333" name="Xsim standard deviation"/>
-				<connector uid="12" angle="340.942">
-					<from>asdf</from>
+				<aux x="601.667" y="594.333" name="Xsim standard deviation"/>
+				<connector uid="6" angle="13.7909">
+					<from>Mean_Xsim</from>
 					<to>Xsim_standard_deviation</to>
 				</connector>
-				<connector uid="13" angle="13.7909">
-					<from>Xsim_mean</from>
-					<to>Xsim_standard_deviation</to>
-				</connector>
-				<module x="213.333" y="835.833" width="55" height="45" name="E Xobs^2"/>
-				<aux x="141.458" y="858.333" name="Xobs^2"/>
-				<aux font_style="italic" font_weight="bold" x="338.333" y="858.333" name="asdf 1"/>
-				<connector uid="14" angle="0">
-					<from>&quot;E_Xobs^2&quot;</from>
-					<to>asdf_1</to>
-				</connector>
-				<connector uid="15" angle="0">
-					<from>&quot;Xobs^2&quot;</from>
-					<to>&quot;E_Xobs^2&quot;</to>
-				</connector>
-				<aux x="466.667" y="819.333" name="Xobs standard deviation"/>
-				<connector uid="16" angle="342.896">
-					<from>Xobs_mean</from>
+				<aux x="473.333" y="858.333" name="Mean Xobs^2"/>
+				<aux x="601.667" y="819.333" name="Xobs standard deviation"/>
+				<connector uid="7" angle="342.896">
+					<from>Mean_Xobs</from>
 					<to>Xobs_standard_deviation</to>
 				</connector>
-				<connector uid="17" angle="18.4349">
-					<from>asdf_1</from>
+				<connector uid="8" angle="18.4349">
+					<from>&quot;Mean_Xobs^2&quot;</from>
 					<to>Xobs_standard_deviation</to>
 				</connector>
-				<aux x="585.833" y="695.833" name="Correlation.XsimXobs"/>
-				<connector uid="18" angle="322.104">
+				<aux x="720.833" y="695.833" name="Correlation.XsimXobs"/>
+				<connector uid="9" angle="322.104">
 					<from>Xsim_standard_deviation</from>
 					<to>&quot;Correlation.XsimXobs&quot;</to>
 				</connector>
-				<connector uid="19" angle="4.28858">
+				<connector uid="10" angle="4.28858">
 					<from>Covariance_XsimXobs</from>
 					<to>&quot;Correlation.XsimXobs&quot;</to>
 				</connector>
-				<connector uid="20" angle="45.8053">
+				<connector uid="11" angle="45.8053">
 					<from>Xobs_standard_deviation</from>
 					<to>&quot;Correlation.XsimXobs&quot;</to>
 				</connector>
 				<aux x="380" y="480.625" name="RMSE"/>
-				<connector uid="21" angle="354.118">
+				<connector uid="12" angle="354.118">
 					<from>MSE</from>
 					<to>RMSE</to>
 				</connector>
-				<aux x="670" y="695.833" name="Rsquared"/>
-				<connector uid="22" angle="359.999">
+				<aux x="805" y="695.833" name="Rsquared"/>
+				<connector uid="13" angle="359.999">
 					<from>&quot;Correlation.XsimXobs&quot;</from>
 					<to>Rsquared</to>
 				</connector>
-				<aux x="914.167" y="684.167" name="Um"/>
-				<connector uid="23" angle="345.964">
+				<aux x="1049.17" y="684.167" name="Um"/>
+				<connector uid="14" angle="345.964">
 					<from>
-						<alias uid="24"/>
+						<alias uid="15"/>
 					</from>
 					<to>Um</to>
 				</connector>
-				<connector uid="25" angle="129.369">
+				<connector uid="16" angle="129.369">
 					<from>
-						<alias uid="26"/>
+						<alias uid="17"/>
 					</from>
 					<to>Um</to>
 				</connector>
-				<aux x="914.167" y="759.167" name="Us"/>
-				<connector uid="27" angle="0">
+				<aux x="1049.17" y="759.167" name="Us"/>
+				<connector uid="18" angle="0">
 					<from>
-						<alias uid="28"/>
+						<alias uid="19"/>
 					</from>
 					<to>Us</to>
 				</connector>
-				<connector uid="29" angle="10.0781">
+				<connector uid="20" angle="10.0781">
 					<from>
-						<alias uid="30"/>
+						<alias uid="21"/>
 					</from>
 					<to>Us</to>
 				</connector>
-				<connector uid="31" angle="180">
+				<connector uid="22" angle="180">
 					<from>
-						<alias uid="26"/>
+						<alias uid="17"/>
 					</from>
 					<to>Us</to>
 				</connector>
-				<aux x="914.167" y="840.333" name="Uc"/>
-				<connector uid="32" angle="327.995">
+				<aux x="1049.17" y="840.333" name="Uc"/>
+				<connector uid="23" angle="327.995">
 					<from>
-						<alias uid="28"/>
+						<alias uid="19"/>
 					</from>
 					<to>Uc</to>
 				</connector>
-				<connector uid="33" angle="347.554">
+				<connector uid="24" angle="347.554">
 					<from>
-						<alias uid="30"/>
+						<alias uid="21"/>
 					</from>
 					<to>Uc</to>
 				</connector>
-				<connector uid="34" angle="239.036">
+				<connector uid="25" angle="239.036">
 					<from>
-						<alias uid="26"/>
+						<alias uid="17"/>
 					</from>
 					<to>Uc</to>
 				</connector>
-				<connector uid="35" angle="9.16235">
+				<connector uid="26" angle="9.16235">
 					<from>
-						<alias uid="36"/>
+						<alias uid="27"/>
 					</from>
 					<to>Uc</to>
 				</connector>
-				<connector uid="37" angle="4.50491">
+				<connector uid="28" angle="4.50491">
 					<from>
-						<alias uid="38"/>
+						<alias uid="29"/>
 					</from>
 					<to>Um</to>
 				</connector>
 				<aux label_side="top" x="190.833" y="185.542" name="X observed"/>
 				<aux label_side="top" x="293.333" y="185.542" name="X simulated"/>
-				<connector uid="39" angle="250.415">
+				<connector uid="30" angle="225.985">
 					<from>X_observed</from>
 					<to>ABS_error_at_t</to>
 				</connector>
-				<connector uid="40" angle="268.615">
+				<connector uid="31" angle="300.934">
 					<from>X_observed</from>
 					<to>Squared_error_at_t</to>
 				</connector>
-				<connector uid="41" angle="268.466">
+				<connector uid="32" angle="268.466">
 					<from>X_simulated</from>
 					<to>ABS_error_at_t</to>
 				</connector>
-				<connector uid="42" angle="305.705">
+				<connector uid="33" angle="305.705">
 					<from>X_simulated</from>
 					<to>Squared_error_at_t</to>
 				</connector>
-				<connector uid="43" angle="90">
+				<stock x="299.667" y="552" name="Total Xsim^2l"/>
+				<flow label_side="top" x="217.5" y="551.667" name="Xsim^2">
+					<pts>
+						<pt x="145.833" y="551.667"/>
+						<pt x="277.167" y="551.667"/>
+					</pts>
+				</flow>
+				<aux x="473.333" y="552" name="Mean Xsim^2"/>
+				<connector uid="34" angle="0">
+					<from>&quot;Total_Xsim^2l&quot;</from>
+					<to>&quot;Mean_Xsim^2&quot;</to>
+				</connector>
+				<connector uid="35" angle="54.1307">
 					<from>
-						<alias uid="44"/>
+						<alias uid="36"/>
 					</from>
 					<to>&quot;Xsim^2&quot;</to>
 				</connector>
-				<connector uid="45" angle="270">
-					<from>
-						<alias uid="44"/>
-					</from>
-					<to>XsimXobs</to>
+				<connector uid="37" angle="347.867">
+					<from>&quot;Mean_Xsim^2&quot;</from>
+					<to>Xsim_standard_deviation</to>
 				</connector>
-				<connector uid="46" angle="90">
+				<stock x="343.834" y="622.833" name="Total Xsim"/>
+				<flow label_side="top" x="261.667" y="622.5" name="Xsim">
+					<pts>
+						<pt x="190" y="622.5"/>
+						<pt x="321.334" y="622.5"/>
+					</pts>
+				</flow>
+				<connector uid="38" angle="15.94">
 					<from>
-						<alias uid="47"/>
+						<alias uid="36"/>
 					</from>
-					<to>XsimXobs</to>
+					<to>Xsim</to>
 				</connector>
-				<connector uid="48" angle="269.464">
+				<connector uid="39" angle="356.224">
+					<from>Total_Xsim</from>
+					<to>Mean_Xsim</to>
+				</connector>
+				<stock x="341.334" y="693.666" name="Total Xsim * Xobs"/>
+				<flow label_side="top" x="259.167" y="693.333" name="Xsim * Xobs">
+					<pts>
+						<pt x="187.5" y="693.333"/>
+						<pt x="318.834" y="693.333"/>
+					</pts>
+				</flow>
+				<connector uid="40" angle="342.772">
 					<from>
-						<alias uid="47"/>
+						<alias uid="36"/>
+					</from>
+					<to>&quot;Xsim_*_Xobs&quot;</to>
+				</connector>
+				<connector uid="41" angle="22.1155">
+					<from>
+						<alias uid="42"/>
+					</from>
+					<to>&quot;Xsim_*_Xobs&quot;</to>
+				</connector>
+				<connector uid="43" angle="359.06">
+					<from>&quot;Total_Xsim_*_Xobs&quot;</from>
+					<to>&quot;Mean_Xsim_*_Xobs&quot;</to>
+				</connector>
+				<stock x="355.501" y="771.166" name="Total Xobs"/>
+				<flow label_side="top" x="273.334" y="770.833" name="Xobs">
+					<pts>
+						<pt x="201.667" y="770.833"/>
+						<pt x="333.001" y="770.833"/>
+					</pts>
+				</flow>
+				<connector uid="44" angle="347.322">
+					<from>
+						<alias uid="42"/>
+					</from>
+					<to>Xobs</to>
+				</connector>
+				<connector uid="45" angle="8.43733">
+					<from>Total_Xobs</from>
+					<to>Mean_Xobs</to>
+				</connector>
+				<stock x="309.668" y="856.999" name="Total Xobs^2"/>
+				<flow label_side="top" x="227.501" y="856.666" name="Xobs^2">
+					<pts>
+						<pt x="155.834" y="856.666"/>
+						<pt x="287.168" y="856.666"/>
+					</pts>
+				</flow>
+				<connector uid="46" angle="301.406">
+					<from>
+						<alias uid="42"/>
 					</from>
 					<to>&quot;Xobs^2&quot;</to>
 				</connector>
-				<connector uid="49" angle="0">
-					<from>
-						<alias uid="44"/>
-					</from>
-					<to>E_Xsim</to>
+				<connector uid="47" angle="355.745">
+					<from>&quot;Total_Xobs^2&quot;</from>
+					<to>&quot;Mean_Xobs^2&quot;</to>
 				</connector>
-				<connector uid="50" angle="0">
-					<from>
-						<alias uid="47"/>
-					</from>
-					<to>E_Xobs</to>
-				</connector>
-				<alias color="blue" background="white" font_style="italic" uid="26" x="966.833" y="750.167" width="18" height="18">
+				<alias color="blue" background="white" font_style="italic" uid="17" x="1101.83" y="750.167" width="18" height="18">
 					<shape type="circle" radius="18"/>
 					<of>MSE</of>
 				</alias>
-				<alias color="blue" background="white" font_style="italic" uid="28" x="782.667" y="750.167" width="18" height="18">
+				<alias color="blue" background="white" font_style="italic" uid="19" x="917.667" y="750.167" width="18" height="18">
 					<shape type="circle" radius="18"/>
 					<of>Xsim_standard_deviation</of>
 				</alias>
-				<alias color="blue" background="white" font_style="italic" uid="30" x="782.667" y="792.333" width="18" height="18">
+				<alias color="blue" background="white" font_style="italic" uid="21" x="917.667" y="792.333" width="18" height="18">
 					<shape type="circle" radius="18"/>
 					<of>Xobs_standard_deviation</of>
 				</alias>
-				<alias font_style="italic" font_weight="bold" uid="24" x="784.333" y="637.667" width="18" height="18">
-					<of>Xsim_mean</of>
+				<alias font_style="italic" font_weight="bold" uid="15" x="919.333" y="637.667" width="18" height="18">
+					<of>Mean_Xsim</of>
 				</alias>
-				<alias color="blue" background="white" font_style="italic" uid="36" x="785.167" y="842.667" width="18" height="18">
+				<alias color="blue" background="white" font_style="italic" uid="27" x="920.167" y="842.667" width="18" height="18">
 					<shape type="circle" radius="18"/>
 					<of>&quot;Correlation.XsimXobs&quot;</of>
 				</alias>
-				<alias font_style="italic" font_weight="bold" uid="38" x="784.333" y="693.167" width="18" height="18">
-					<of>Xobs_mean</of>
+				<alias font_style="italic" font_weight="bold" uid="29" x="919.333" y="693.167" width="18" height="18">
+					<of>Mean_Xobs</of>
 				</alias>
-				<alias font_style="italic" label_side="left" uid="47" x="133.292" y="760.166" width="18" height="18">
+				<alias font_style="italic" label_side="left" uid="42" x="132.458" y="732.167" width="18" height="18">
 					<of>X_observed</of>
 				</alias>
-				<alias font_style="italic" label_side="left" uid="44" x="133.292" y="616.833" width="18" height="18">
+				<alias font_style="italic" label_side="left" uid="36" x="132.458" y="647.833" width="18" height="18">
 					<of>X_simulated</of>
 				</alias>
 			</view>
 			<view isee:template_view="template:1" background="white" page_width="800" page_height="600" isee:scroll_x="2" home_view="true" type="interface">
 				<style/>
-				<text_box uid="51" x="46" y="51" width="701" height="421">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+				<text_box uid="48" x="46" y="51" width="701" height="421">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -505,53 +531,53 @@ p, li { white-space: pre-wrap; }
 			</view>
 			<view isee:template_view="template:2" background="white" page_width="800" page_height="600" isee:scroll_x="34" type="interface">
 				<style/>
-				<stacked_container uid="52" x="292" y="98" width="484" height="443">
+				<stacked_container uid="49" x="292" y="98" width="484" height="443">
 					<graph isee:graph_area_color="white" width="484" height="443" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="True or latent time-series vs. observed time series" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true"/>
 				</stacked_container>
-				<slider uid="53" x="34.5" y="203.5" width="238" height="39" isee:navigate_to="false" show_name="true">
+				<slider uid="50" x="34.5" y="203.5" width="238" height="39" isee:navigate_to="false" show_name="true">
 					<reset_to after="never">0</reset_to>
 				</slider>
-				<slider uid="54" x="33.5" y="145.5" width="234" height="39" isee:navigate_to="false" show_name="true">
+				<slider uid="51" x="33.5" y="145.5" width="234" height="39" isee:navigate_to="false" show_name="true">
 					<reset_to after="never">0</reset_to>
 				</slider>
-				<slider num_ticks="2" uid="55" x="30.5" y="366.5" width="240" height="39" isee:navigate_to="false" show_name="true">
+				<slider num_ticks="2" uid="52" x="30.5" y="366.5" width="240" height="39" isee:navigate_to="false" show_name="true">
 					<reset_to after="never">0</reset_to>
 				</slider>
-				<slider uid="56" x="30.5" y="424.5" width="240" height="39" isee:navigate_to="false" show_name="true">
+				<slider uid="53" x="30.5" y="424.5" width="240" height="39" isee:navigate_to="false" show_name="true">
 					<reset_to after="never">0</reset_to>
 				</slider>
-				<slider num_ticks="2" uid="57" x="30.5" y="482.5" width="240" height="39" isee:navigate_to="false" show_name="true">
+				<slider num_ticks="2" uid="54" x="30.5" y="482.5" width="240" height="39" isee:navigate_to="false" show_name="true">
 					<reset_to after="never">0</reset_to>
 				</slider>
-				<slider uid="58" x="33.5" y="537.5" width="240" height="39" isee:navigate_to="false" show_name="true">
+				<slider uid="55" x="33.5" y="537.5" width="240" height="39" isee:navigate_to="false" show_name="true">
 					<reset_to after="never">0</reset_to>
 				</slider>
-				<text_box appearance="transparent" uid="59" x="26" y="90.5" width="241" height="58">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+				<text_box appearance="transparent" uid="56" x="26" y="90.5" width="241" height="58">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:12pt; font-weight:600; color:#000000;&quot;&gt;Parameters for &amp;quot;true&amp;quot; or latent time-series&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</text_box>
-				<text_box appearance="transparent" uid="60" x="30" y="290.5" width="247" height="58">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+				<text_box appearance="transparent" uid="57" x="30" y="290.5" width="247" height="58">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:12pt; font-weight:600; color:#000000;&quot;&gt;Parameters for measurement error in observed time-series (Xobs)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</text_box>
-				<button label="" uid="61" x="329" y="568.5">
+				<button label="" uid="58" x="329" y="568.5">
 					<actions>
 						<action>start_stella_live</action>
 					</actions>
 				</button>
-				<button label="" uid="62" x="401" y="568.5">
+				<button label="" uid="59" x="401" y="568.5">
 					<actions>
 						<action>stop_stella_live</action>
 					</actions>
 				</button>
-				<button label="" uid="63" x="477" y="568.5">
+				<button label="" uid="60" x="477" y="568.5">
 					<actions>
 						<action>restore_all</action>
 					</actions>
 				</button>
-				<text_box uid="64" x="24" y="16.5" width="754" height="58">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+				<text_box uid="61" x="24" y="16.5" width="754" height="58">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -559,76 +585,76 @@ p, li { white-space: pre-wrap; }
 			</view>
 			<view isee:template_view="template:3" background="white" page_width="800" page_height="600" type="interface">
 				<style/>
-				<stacked_container uid="65" x="292" y="96" width="484" height="443">
+				<stacked_container uid="62" x="292" y="96" width="484" height="443">
 					<graph isee:graph_area_color="white" width="484" height="443" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="True or latent time-series vs. observed time series" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true"/>
 				</stacked_container>
-				<slider uid="66" x="34.5" y="199.5" width="238" height="39" isee:navigate_to="false" show_name="true">
+				<slider uid="63" x="34.5" y="199.5" width="238" height="39" isee:navigate_to="false" show_name="true">
 					<reset_to after="never">0</reset_to>
 				</slider>
-				<slider num_ticks="2" uid="67" x="33.5" y="145.5" width="234" height="39" isee:navigate_to="false" show_name="true">
+				<slider num_ticks="2" uid="64" x="33.5" y="145.5" width="234" height="39" isee:navigate_to="false" show_name="true">
 					<reset_to after="never">0</reset_to>
 				</slider>
-				<text_box appearance="transparent" uid="68" x="26" y="90.5" width="241" height="58">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+				<text_box appearance="transparent" uid="65" x="26" y="90.5" width="241" height="58">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:12pt; font-weight:600; color:#000000;&quot;&gt;Parameters for simulated model of time-series (Xsim)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</text_box>
-				<button label="" uid="69" x="329" y="566.5">
+				<button label="" uid="66" x="329" y="566.5">
 					<actions>
 						<action>start_stella_live</action>
 					</actions>
 				</button>
-				<button label="" uid="70" x="401" y="566.5">
+				<button label="" uid="67" x="401" y="566.5">
 					<actions>
 						<action>stop_stella_live</action>
 					</actions>
 				</button>
-				<button label="" uid="71" x="477" y="566.5">
+				<button label="" uid="68" x="477" y="566.5">
 					<actions>
 						<action>restore_all</action>
 					</actions>
 				</button>
-				<text_box uid="72" x="24" y="16.5" width="754" height="58">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+				<text_box uid="69" x="24" y="16.5" width="754" height="58">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Arial&apos;; font-size:11pt; color:#000000;&quot;&gt;On this page, you can change the parameters for your simulated curve (Xsim) and see the effect on the statistics for assessing the fit between Xsim and Xobs. The model starts out with parameters the mean, period, and amplitude of Xsim equal to the &amp;quot;true&amp;quot; or latent time series and no phase shift. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</text_box>
-				<slider num_ticks="2" uid="73" x="34.5" y="308.5" width="238" height="39" isee:navigate_to="false" show_name="true">
+				<slider num_ticks="2" uid="70" x="34.5" y="308.5" width="238" height="39" isee:navigate_to="false" show_name="true">
 					<reset_to after="never">0</reset_to>
 				</slider>
-				<slider uid="74" x="34.5" y="255.5" width="238" height="39" isee:navigate_to="false" show_name="true">
+				<slider uid="71" x="34.5" y="255.5" width="238" height="39" isee:navigate_to="false" show_name="true">
 					<reset_to after="never">0</reset_to>
 				</slider>
-				<numeric_display color="#33CCFF" uid="75" x="35.5" y="397" width="234" height="16" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+				<numeric_display color="#33CCFF" uid="72" x="35.5" y="397" width="234" height="16" retain_ending_value="true" isee:navigate_to="false" show_name="true">
 					<entity name="MAE"/>
 				</numeric_display>
-				<numeric_display color="#33CCFF" uid="76" x="35.5" y="421" width="234" height="16" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+				<numeric_display color="#33CCFF" uid="73" x="35.5" y="421" width="234" height="16" retain_ending_value="true" isee:navigate_to="false" show_name="true">
 					<entity name="MSE"/>
 				</numeric_display>
-				<numeric_display color="#33CCFF" uid="77" x="35.5" y="516" width="234" height="16" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+				<numeric_display color="#33CCFF" uid="74" x="35.5" y="516" width="234" height="16" retain_ending_value="true" isee:navigate_to="false" show_name="true">
 					<entity name="RMSE"/>
 				</numeric_display>
-				<numeric_display color="#33CCFF" uid="78" x="35.5" y="539" width="234" height="16" title="Correlation" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+				<numeric_display color="#33CCFF" uid="75" x="35.5" y="539" width="234" height="16" title="Correlation" retain_ending_value="true" isee:navigate_to="false" show_name="true">
 					<format precision="0.01"/>
 					<entity name='"Correlation.XsimXobs"'/>
 				</numeric_display>
-				<numeric_display color="#33CCFF" uid="79" x="35.5" y="562" width="234" height="16" title="R^2" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+				<numeric_display color="#33CCFF" uid="76" x="35.5" y="562" width="234" height="16" title="R^2" retain_ending_value="true" isee:navigate_to="false" show_name="true">
 					<format precision="0.01"/>
 					<entity name="Rsquared"/>
 				</numeric_display>
-				<numeric_display color="#33CCFF" uid="80" x="35.5" y="444" width="234" height="16" title="Um, bias component of MSE" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+				<numeric_display color="#33CCFF" uid="77" x="35.5" y="444" width="234" height="16" title="Um, bias component of MSE" retain_ending_value="true" isee:navigate_to="false" show_name="true">
 					<format precision="0.001"/>
 					<entity name="Um"/>
 				</numeric_display>
-				<numeric_display color="#33CCFF" uid="81" x="35.5" y="468" width="234" height="16" title="Us, variation component of MSE" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+				<numeric_display color="#33CCFF" uid="78" x="35.5" y="468" width="234" height="16" title="Us, variation component of MSE" retain_ending_value="true" isee:navigate_to="false" show_name="true">
 					<format precision="0.001"/>
 					<entity name="Us"/>
 				</numeric_display>
-				<numeric_display color="#33CCFF" uid="82" x="35.5" y="492" width="234" height="16" title="Uc, covariation component of MSE" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+				<numeric_display color="#33CCFF" uid="79" x="35.5" y="492" width="234" height="16" title="Uc, covariation component of MSE" retain_ending_value="true" isee:navigate_to="false" show_name="true">
 					<format precision="0.001"/>
 					<entity name="Uc"/>
 				</numeric_display>
-				<text_box appearance="transparent" uid="83" x="26" y="363" width="241" height="58">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+				<text_box appearance="transparent" uid="80" x="26" y="363" width="241" height="58">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;.SF NS Text&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -637,7 +663,7 @@ p, li { white-space: pre-wrap; }
 			<isee:templates>
 				<view background="white" page_width="800" page_height="600" type="template">
 					<style/>
-					<button label="" uid="84" x="744" y="568">
+					<button label="" uid="81" x="744" y="568">
 						<actions>
 							<action target="next_page">navigate</action>
 						</actions>
@@ -645,12 +671,12 @@ p, li { white-space: pre-wrap; }
 				</view>
 				<view background="white" page_width="800" page_height="600" type="template">
 					<style/>
-					<button label="" uid="85" x="744" y="568">
+					<button label="" uid="82" x="744" y="568">
 						<actions>
 							<action target="next_page">navigate</action>
 						</actions>
 					</button>
-					<button label="" uid="86" x="674" y="568">
+					<button label="" uid="83" x="674" y="568">
 						<actions>
 							<action target="previous_page">navigate</action>
 						</actions>
@@ -658,7 +684,7 @@ p, li { white-space: pre-wrap; }
 				</view>
 				<view background="white" page_width="800" page_height="600" type="template">
 					<style/>
-					<button label="" uid="87" x="744" y="568">
+					<button label="" uid="84" x="744" y="568">
 						<actions>
 							<action target="previous_page">navigate</action>
 						</actions>
@@ -666,331 +692,6 @@ p, li { white-space: pre-wrap; }
 				</view>
 			</isee:templates>
 			<isee:stories/>
-		</views>
-	</model>
-	<model name="E_Xobs">
-		<variables>
-			<stock name="Total">
-				<eqn>0</eqn>
-				<inflow>Flow_1</inflow>
-				<units>0</units>
-			</stock>
-			<flow name="Flow 1" access="input"/>
-			<aux name="Expected value" access="output">
-				<eqn>SAFEDIV(Total, TIME-STARTTIME)</eqn>
-			</aux>
-		</variables>
-		<views>
-			<view isee:show_pages="false" background="white" page_width="768" page_height="588" isee:popup_graphs_are_comparative="true" type="stock_flow">
-				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
-					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
-						<shape type="rectangle" width="45" height="35"/>
-					</stock>
-					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
-					<isee:placeholder color="#228B22" background="white" font_color="#228B22" label_side="bottom"/>
-					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
-						<shape type="rectangle" width="55" height="45"/>
-					</module>
-					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
-						<shape type="circle" radius="18"/>
-					</aux>
-					<group color="red" background="white" font_color="red" font_size="9pt"/>
-					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
-					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
-					<isee:loop_indicator color="black" background="white"/>
-					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
-					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
-						<isee:series_styles>
-							<isee:series_style color="blue" thickness="1"/>
-							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#FF7F00" thickness="1"/>
-							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#FF007F" thickness="1"/>
-							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#C8C8C8" thickness="1"/>
-						</isee:series_styles>
-					</graph>
-					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
-				</style>
-				<stock x="256.667" y="216.667" name="Total"/>
-				<flow font_style="italic" font_weight="bold" x="190.417" y="215.833" name="Flow 1">
-					<pts>
-						<pt x="146.667" y="215.833"/>
-						<pt x="234.167" y="215.833"/>
-					</pts>
-				</flow>
-				<aux x="355" y="216.667" name="Expected value"/>
-				<connector uid="88" angle="4.844">
-					<from>Total</from>
-					<to>Expected_value</to>
-				</connector>
-			</view>
-		</views>
-	</model>
-	<model name='"E_Xobs^2"'>
-		<variables>
-			<stock name="Total">
-				<eqn>0</eqn>
-				<inflow>Flow_1</inflow>
-				<units>0</units>
-			</stock>
-			<flow name="Flow 1" access="input"/>
-			<aux name="Expected value" access="output">
-				<eqn>SAFEDIV(Total, TIME-STARTTIME)</eqn>
-			</aux>
-		</variables>
-		<views>
-			<view isee:show_pages="false" background="white" page_width="768" page_height="588" isee:popup_graphs_are_comparative="true" type="stock_flow">
-				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
-					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
-						<shape type="rectangle" width="45" height="35"/>
-					</stock>
-					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
-					<isee:placeholder color="#228B22" background="white" font_color="#228B22" label_side="bottom"/>
-					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
-						<shape type="rectangle" width="55" height="45"/>
-					</module>
-					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
-						<shape type="circle" radius="18"/>
-					</aux>
-					<group color="red" background="white" font_color="red" font_size="9pt"/>
-					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
-					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
-					<isee:loop_indicator color="black" background="white"/>
-					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
-					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
-						<isee:series_styles>
-							<isee:series_style color="blue" thickness="1"/>
-							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#FF7F00" thickness="1"/>
-							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#FF007F" thickness="1"/>
-							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#C8C8C8" thickness="1"/>
-						</isee:series_styles>
-					</graph>
-					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
-				</style>
-				<stock x="256.667" y="216.667" name="Total"/>
-				<flow font_style="italic" font_weight="bold" x="190.417" y="215.833" name="Flow 1">
-					<pts>
-						<pt x="146.667" y="215.833"/>
-						<pt x="234.167" y="215.833"/>
-					</pts>
-				</flow>
-				<aux x="355" y="216.667" name="Expected value"/>
-				<connector uid="89" angle="4.844">
-					<from>Total</from>
-					<to>Expected_value</to>
-				</connector>
-			</view>
-		</views>
-	</model>
-	<model name="E_Xsim">
-		<variables>
-			<stock name="Total">
-				<eqn>0</eqn>
-				<inflow>Flow_1</inflow>
-				<units>0</units>
-			</stock>
-			<flow name="Flow 1" access="input"/>
-			<aux name="Expected value" access="output">
-				<eqn>SAFEDIV(Total, TIME-STARTTIME)</eqn>
-			</aux>
-		</variables>
-		<views>
-			<view isee:show_pages="false" background="white" page_width="768" page_height="588" zoom="120" isee:popup_graphs_are_comparative="true" type="stock_flow">
-				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
-					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
-						<shape type="rectangle" width="45" height="35"/>
-					</stock>
-					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
-					<isee:placeholder color="#228B22" background="white" font_color="#228B22" label_side="bottom"/>
-					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
-						<shape type="rectangle" width="55" height="45"/>
-					</module>
-					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
-						<shape type="circle" radius="18"/>
-					</aux>
-					<group color="red" background="white" font_color="red" font_size="9pt"/>
-					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
-					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
-					<isee:loop_indicator color="black" background="white"/>
-					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
-					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
-						<isee:series_styles>
-							<isee:series_style color="blue" thickness="1"/>
-							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#FF7F00" thickness="1"/>
-							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#FF007F" thickness="1"/>
-							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#C8C8C8" thickness="1"/>
-						</isee:series_styles>
-					</graph>
-					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
-				</style>
-				<stock x="256.667" y="216.667" name="Total"/>
-				<flow font_style="italic" font_weight="bold" x="190.417" y="215.833" name="Flow 1">
-					<pts>
-						<pt x="146.667" y="215.833"/>
-						<pt x="234.167" y="215.833"/>
-					</pts>
-				</flow>
-				<aux x="355" y="216.667" name="Expected value"/>
-				<connector uid="90" angle="4.844">
-					<from>Total</from>
-					<to>Expected_value</to>
-				</connector>
-			</view>
-		</views>
-	</model>
-	<model name='"E_Xsim^2"'>
-		<variables>
-			<stock name="Total">
-				<eqn>0</eqn>
-				<inflow>Flow_1</inflow>
-				<units>0</units>
-			</stock>
-			<flow name="Flow 1" access="input"/>
-			<aux name="Expected value" access="output">
-				<eqn>SAFEDIV(Total, TIME-STARTTIME)</eqn>
-			</aux>
-		</variables>
-		<views>
-			<view isee:show_pages="false" background="white" page_width="768" page_height="588" isee:popup_graphs_are_comparative="true" type="stock_flow">
-				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
-					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
-						<shape type="rectangle" width="45" height="35"/>
-					</stock>
-					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
-					<isee:placeholder color="#228B22" background="white" font_color="#228B22" label_side="bottom"/>
-					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
-						<shape type="rectangle" width="55" height="45"/>
-					</module>
-					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
-						<shape type="circle" radius="18"/>
-					</aux>
-					<group color="red" background="white" font_color="red" font_size="9pt"/>
-					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
-					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
-					<isee:loop_indicator color="black" background="white"/>
-					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
-					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
-						<isee:series_styles>
-							<isee:series_style color="blue" thickness="1"/>
-							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#FF7F00" thickness="1"/>
-							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#FF007F" thickness="1"/>
-							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#C8C8C8" thickness="1"/>
-						</isee:series_styles>
-					</graph>
-					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
-				</style>
-				<stock x="256.667" y="216.667" name="Total"/>
-				<flow font_style="italic" font_weight="bold" x="190.417" y="215.833" name="Flow 1">
-					<pts>
-						<pt x="146.667" y="215.833"/>
-						<pt x="234.167" y="215.833"/>
-					</pts>
-				</flow>
-				<aux x="355" y="216.667" name="Expected value"/>
-				<connector uid="91" angle="4.844">
-					<from>Total</from>
-					<to>Expected_value</to>
-				</connector>
-			</view>
-		</views>
-	</model>
-	<model name="E_XsimXobs">
-		<variables>
-			<stock name="Total">
-				<eqn>0</eqn>
-				<inflow>Flow_1</inflow>
-				<units>0</units>
-			</stock>
-			<flow name="Flow 1" access="input"/>
-			<aux name="Expected value" access="output">
-				<eqn>SAFEDIV(Total, TIME-STARTTIME)</eqn>
-			</aux>
-		</variables>
-		<views>
-			<view isee:show_pages="false" background="white" page_width="768" page_height="588" isee:popup_graphs_are_comparative="true" type="stock_flow">
-				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
-					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
-						<shape type="rectangle" width="45" height="35"/>
-					</stock>
-					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
-					<isee:placeholder color="#228B22" background="white" font_color="#228B22" label_side="bottom"/>
-					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
-						<shape type="rectangle" width="55" height="45"/>
-					</module>
-					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
-						<shape type="circle" radius="18"/>
-					</aux>
-					<group color="red" background="white" font_color="red" font_size="9pt"/>
-					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
-					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
-					<isee:loop_indicator color="black" background="white"/>
-					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
-					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
-						<isee:series_styles>
-							<isee:series_style color="blue" thickness="1"/>
-							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#FF7F00" thickness="1"/>
-							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#FF007F" thickness="1"/>
-							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
-							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
-							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
-							<isee:series_style color="#C8C8C8" thickness="1"/>
-						</isee:series_styles>
-					</graph>
-					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
-				</style>
-				<stock x="256.667" y="216.667" name="Total"/>
-				<flow font_style="italic" font_weight="bold" x="190.417" y="215.833" name="Flow 1">
-					<pts>
-						<pt x="146.667" y="215.833"/>
-						<pt x="234.167" y="215.833"/>
-					</pts>
-				</flow>
-				<aux x="355" y="216.667" name="Expected value"/>
-				<connector uid="92" angle="4.844">
-					<from>Total</from>
-					<to>Expected_value</to>
-				</connector>
-			</view>
 		</views>
 	</model>
 </xmile>
