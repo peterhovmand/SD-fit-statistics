@@ -101,12 +101,8 @@ Xsim_standard_deviation*Xobs_standard_deviation)</eqn>
 Xsim_standard_deviation*
 Xobs_standard_deviation, MSE)</eqn>
 			</aux>
-			<aux name="X observed" access="input">
-				<eqn>0</eqn>
-			</aux>
-			<aux name="X simulated" access="input">
-				<eqn>.5</eqn>
-			</aux>
+			<aux name="X observed" access="input"/>
+			<aux name="X simulated" access="input"/>
 			<stock name="Total Xsim^2l">
 				<eqn>0</eqn>
 				<inflow>&quot;Xsim^2&quot;</inflow>
@@ -196,7 +192,7 @@ Xobs_standard_deviation, MSE)</eqn>
 				<isee:iframe color="black" background="white"/>
 				<isee:financial_table color="black" background="white" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
 			</style>
-			<view isee:show_pages="false" background="white" page_width="768" page_height="588" isee:page_cols="2" isee:page_rows="2" isee:scroll_x="7.5" isee:scroll_y="230" zoom="120" isee:popup_graphs_are_comparative="true" type="stock_flow">
+			<view isee:show_pages="false" background="white" page_width="768" page_height="588" isee:page_cols="2" isee:page_rows="2" zoom="120" isee:popup_graphs_are_comparative="true" type="stock_flow">
 				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
 					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
 						<shape type="rectangle" width="45" height="35"/>
