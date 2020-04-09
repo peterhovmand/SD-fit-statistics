@@ -11,6 +11,6 @@ The main difference between the two approaches is their implementation. While th
 # References
 Forrester, J. W., & Senge, P. M. (1980). Tests for building model confidence in system dynamics models. In G. P. Richardson (Ed.), *Modelling for Management: Volume II: Simulation in Support of Systems Thinking.* (pp. 413--432). Brookfield, VT: Dartmouth Publishing Company, Ltd.
 
-Sterman, J. D. (1984). Appropriate summary statistics for evaluating the historical fit of system dynamics models. *DYNAMICA*, 10(2), 51-66. 
+[Sterman, J. D. (1984). Appropriate summary statistics for evaluating the historical fit of system dynamics models. *DYNAMICA*, 10(2), 51-66.](https://www.systemdynamics.org/assets/dynamica/102/4.pdf)
 
 Sterman, J. D. (2000). *Business dynamics: Systems thinking and modeling for a complex world.* Irwin McGraw-Hill.
